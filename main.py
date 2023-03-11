@@ -42,7 +42,7 @@ def today_weather(message):
             condition = data['current']['condition']['text']
             wind = data['current']['wind_kph']
             bot.send_message(message.from_user.id,
-                             f"Температура воздуха {temp} градуса, {condition} \nОщущается как {temp_feels} \nградуса Скорость ветра {wind} км/ч")
+                             f"Температура воздуха {temp} градуса, {condition} \nОщущается как {temp_feels} градуса\n Скорость ветра {wind} км/ч")
         except KeyError:
             bot.send_message(message.from_user.id, "Нет информации по выбраному месту")
     except NameError:
