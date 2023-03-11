@@ -42,7 +42,7 @@ def today_weather(message):
             condition = data['current']['condition']['text']
             wind = data['current']['wind_kph']
             bot.send_message(message.from_user.id,
-                             f"Температура воздуха {temp} градуса, {condition} \nОщущается как {temp_feels} градуса\n Скорость ветра {wind} км/ч")
+                             f"Температура воздуха {temp} градуса, {condition}. \nОщущается как {temp_feels} градуса. \nСкорость ветра {wind} км/ч")
         except KeyError:
             bot.send_message(message.from_user.id, "Нет информации по выбраному месту")
     except NameError:
@@ -53,8 +53,6 @@ def today_weather(message):
 def get_text_message(message):
     bot.send_message(message.from_user.id, "Для начала работы укажи регион через /region")
 
-
-# echo-функция, которая отвечает на любое текстовое сообщение таким же текстом
 
 keep_alive()  # запускаем flask-сервер в отдельном потоке.
 bot.polling(non_stop=True, interval=0)  # запуск бота
