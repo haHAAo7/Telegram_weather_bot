@@ -9,6 +9,8 @@ pip.main(['install', 'pytelegrambotapi'])
 bot_token = os.environ['bot_token']
 weather_key = os.environ['weather_key']
 bot = telebot.TeleBot(bot_token)
+region_error = "Вы не выбрали регион"
+region_fail = "Нет информации по выбраному региону"
 
 
 @bot.message_handler(commands=['start'])
@@ -44,9 +46,9 @@ def now_weather(message):
             bot.send_message(message.from_user.id,
                              f"Температура воздуха {temp} градуса, {condition}. \nОщущается как {temp_feels} градуса. \nСкорость ветра {wind} км/ч")
         except KeyError:
-            bot.send_message(message.from_user.id, "Нет информации по выбраному месту")
+            bot.send_message(message.from_user.id, region_fail)
     except NameError:
-        bot.send_message(message.from_user.id, "Вы не выбрали регион")
+        bot.send_message(message.from_user.id, region_error)
 
 
 @bot.message_handler(commands=['today'])
@@ -65,9 +67,9 @@ def today_weather(message):
                 weather_today += f'{time} — {temp} градуса. {condition}\n'
             bot.send_message(message.from_user.id, weather_today)
         except KeyError:
-            bot.send_message(message.from_user.id, "Нет информации по выбраному месту")
+            bot.send_message(message.from_user.id, region_fail)
     except NameError:
-        bot.send_message(message.from_user.id, "Вы не выбрали регион")
+        bot.send_message(message.from_user.id, region_error)
 
 
 @bot.message_handler(content_types=['text'])
