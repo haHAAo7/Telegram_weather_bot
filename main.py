@@ -31,8 +31,8 @@ def region_saver(message):
                  (f'Указан регион - {region}, теперь вы можете посмотреть погоду на сегодня или ближайшие 3 дня'))
 
 
-@bot.message_handler(commands=['today'])
-def today_weather(message):
+@bot.message_handler(commands=['now'])
+def now_weather(message):
     try:
         url = requests.get(f"http://api.weatherapi.com/v1/current.json?key={weather_key}&q={region}&aqi=no&lang=ru")
         data = url.json()
@@ -43,6 +43,27 @@ def today_weather(message):
             wind = data['current']['wind_kph']
             bot.send_message(message.from_user.id,
                              f"Температура воздуха {temp} градуса, {condition}. \nОщущается как {temp_feels} градуса. \nСкорость ветра {wind} км/ч")
+        except KeyError:
+            bot.send_message(message.from_user.id, "Нет информации по выбраному месту")
+    except NameError:
+        bot.send_message(message.from_user.id, "Вы не выбрали регион")
+
+
+@bot.message_handler(commands=['today'])
+def today_weather(message):
+    try:
+        url = requests.get(
+            f"http://api.weatherapi.com/v1/forecast.json?key={weather_key}&q={region}&days=1&aqi=no&alerts=no&lang=ru")
+        data = url.json()
+        day = data['forecast']['forecastday'][0]['hour']
+        weather_today = "Погода на сегодня:\n"
+        try:
+            for hour in day:
+                time = hour['time'].partition(' ')[2]
+                temp = str(hour['temp_c'])
+                condition = hour['condition']['text']
+                weather_today += f'{time} — {temp} градуса. {condition}\n'
+            bot.send_message(message.from_user.id, weather_today)
         except KeyError:
             bot.send_message(message.from_user.id, "Нет информации по выбраному месту")
     except NameError:
