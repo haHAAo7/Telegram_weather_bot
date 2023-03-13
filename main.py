@@ -22,7 +22,7 @@ def start_handler(message):
 
 @bot.message_handler(commands=['region'])
 def region_handler(message):
-    bot.send_message(message.from_user.id, ('Напиши место, в котором хочешь узнать погоду'))
+    bot.send_message(message.from_user.id, ('Укажите место, для которого хотите узнать прогноз погоды'))
     bot.register_next_step_handler(message, region_saver)
 
 
@@ -30,7 +30,7 @@ def region_saver(message):
     global region
     region = message.text
     bot.reply_to(message,
-                 (f'Указан регион - {region}, теперь вы можете посмотреть погоду на сегодня или ближайшие 3 дня'))
+                 (f'Указан регион - {region}, теперь вы можете узнать прогноз погоды'))
 
 
 @bot.message_handler(commands=['now'])
@@ -66,6 +66,28 @@ def today_weather(message):
                 condition = hour['condition']['text']
                 weather_today += f'{time} — {temp} градуса. {condition}\n'
             bot.send_message(message.from_user.id, weather_today)
+        except KeyError:
+            bot.send_message(message.from_user.id, region_fail)
+    except NameError:
+        bot.send_message(message.from_user.id, region_error)
+
+
+@bot.message_handler(commands=['tomorrow'])
+def tomorrow_weather(message):
+    try:
+        url = requests.get(
+            f"http://api.weatherapi.com/v1/forecast.json?key={weather_key}&q={region}&days=2&aqi=no&alerts=no&lang=ru")
+        data = url.json()
+        weather_tomorrow = "Погода на завтра:\n"
+        try:
+            day = data["forecast"]["forecastday"][1]
+            condition = day['day']['condition']['text']
+            morning = f"\nПогода утром: {day['hour'][0]['temp_c']} — {day['hour'][5]['temp_c']}.\n"
+            daytime = f"Погода днем: {day['hour'][6]['temp_c']} — {day['hour'][11]['temp_c']}\n"
+            evening = f"Погода вечером: {day['hour'][12]['temp_c']} — {day['hour'][17]['temp_c']}\n"
+            night = f"Погода ночью: {day['hour'][18]['temp_c']} — {day['hour'][23]['temp_c']}\n"
+            weather_tomorrow += condition + morning + daytime + evening + night
+            bot.send_message(message.from_user.id, weather_tomorrow)
         except KeyError:
             bot.send_message(message.from_user.id, region_fail)
     except NameError:
